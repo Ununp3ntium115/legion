@@ -1,17 +1,42 @@
-FROM gvit/python-secbase:latest
-WORKDIR /
-ENV DISPLAY :0
+# Start from a standard Ubuntu base instead of gvit/python-secbase
+FROM ubuntu:22.04
+
+# Configure environment variables
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=America/Chicago
-RUN git clone https://github.com/GoVanguard/legion.git
-RUN cd legion && \
-    chmod +x ./startLegion.sh && \
+ENV DISPLAY :0
+
+# Update apt, install essential packages
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        git \
+        python3 \
+        python3-pip \
+        python3-venv \
+        python3-dev \
+        build-essential && \
+    rm -rf /var/lib/apt/lists/*
+
+# Create a working directory for Legion
+WORKDIR /legion
+
+# Clone the Legion repo into a temp folder, then move it into /legion
+RUN git clone https://github.com/GoVanguard/legion.git /tmp/legion && \
+    cp -r /tmp/legion/* /legion && \
+    rm -rf /tmp/legion
+
+# Make scripts executable; create /legion/tmp
+RUN chmod +x ./startLegion.sh && \
     chmod +x ./deps/* -R && \
     chmod +x ./scripts/* -R && \
     mkdir -p /legion/tmp
-RUN cd legion && \
-    pip3 install -r requirements.txt --upgrade
-RUN cd legion && \
-    bash ./deps/detectScripts.sh
-WORKDIR /legion
+
+# Upgrade pip, install Python dependencies
+RUN pip3 install --upgrade pip setuptools wheel && \
+    pip3 install --upgrade -r requirements.txt
+
+# Run the detectScripts to finish setup
+RUN ./deps/detectScripts.sh
+
+# The container will default to running legion.py
 CMD ["python3", "legion.py"]
