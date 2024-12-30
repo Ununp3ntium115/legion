@@ -1,4 +1,4 @@
-# Start from a standard Ubuntu base instead of gvit/python-secbase
+# Start from a standard Ubuntu base
 FROM ubuntu:22.04
 
 # Configure environment variables
@@ -14,7 +14,26 @@ RUN apt-get update && \
         python3-pip \
         python3-venv \
         python3-dev \
-        build-essential && \
+        build-essential \
+        nmap \
+        libegl1 \
+        libdbus-1-3 \
+        libx11-6 \
+        libglib2.0-0 \
+        libqt5widgets5 \
+        libqt5gui5 \
+        libqt5core5a \
+        libgl1 \
+        libxkbcommon-x11-0 \
+        libsm6 \
+        libxext6 \
+        libxrender-dev \
+        libfontconfig1 \
+        libxcb-xinerama0 \
+        libxcb-cursor0 \
+        libxcb-render0-dev \
+        libxcb-shm0-dev \
+        libxcb1-dev && \
     rm -rf /var/lib/apt/lists/*
 
 # Create a working directory for Legion
